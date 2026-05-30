@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8733494ab22535446bf2b680d5435124, type: 3}
+  m_Name: Card_LVL2_3
+  m_EditorClassIdentifier: Assembly-CSharp::CardData
+  cardID: 3
+  cardSprite: {fileID: 7987264461964177724, guid: f7c67d69aa654724483a1bfc92af831e, type: 3}
+  fixedSprite: {fileID: 1416122277669166786, guid: 4df7fc41554d80441b62c786d9d80f64, type: 3}
