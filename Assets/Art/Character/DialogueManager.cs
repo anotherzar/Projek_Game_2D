@@ -3,36 +3,37 @@ using TMPro;
 using UnityEngine.InputSystem;
 using System.Collections;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI;
+using UnityEngine.UI; // KUNCI: Buat ngontrol komponen Image langsung
 
 public class DialogueManager : MonoBehaviour
 {
     [Header("UI Reference")]
     public GameObject dialoguePanel;
     public TextMeshProUGUI dialogueText;
-    public GameObject petunjukPanel;
-    public TextMeshProUGUI petunjukText;
 
     [Header("Visual Effects")]
     public GameObject overlaySimbolPecah;
-    public int indexTriggerKedapKedip = 7;
 
-    [Header("Transitions")]
-    public Image fadeImage;
+    [Header("Visual & Transition Effects (DIRECT IMAGE SYSTEM)")]
+    public Image fadeImage;      // Slot untuk pasang langsung objek FadePanel_Final (bukan CanvasGroup)
     public float kecepatanFade = 1f;
+
+    [Header("Character Target")]
     public GameObject arenPlayer;
 
-    [Header("Dialogue Data")]
+    [Header("Dialogue Data Arrays")]
     public DialogueLine[] bookLines;
     public DialogueLine[] introLines;
     public DialogueLine[] dialogPanjangLuma;
     public DialogueLine[] dialogGerbangRusak;
 
     private PlayerMovement playerMovement;
+
     private int jenisDialogAktif = 1;
     private int index = 0;
     private bool dialogueActive = true;
     private bool playerInTriggerPuzzle = false;
+    private bool isTransitioning = false;
     private bool sedangTungguLedakan = false;
 
     void Start()
@@ -43,28 +44,39 @@ public class DialogueManager : MonoBehaviour
 
         if (dialoguePanel != null) dialoguePanel.SetActive(true);
         if (overlaySimbolPecah != null) overlaySimbolPecah.SetActive(false);
-        if (petunjukPanel != null) petunjukPanel.SetActive(false);
 
-        if (fadeImage == null)
+        // Paksa visual warna fade di awal bener-bener transparan (Alpha = 0)
+        if (fadeImage != null)
         {
-            GameObject fadeObj = GameObject.Find("FadePanel_baru") ?? GameObject.Find("FadePanel") ?? GameObject.Find("FadeImage");
-            if (fadeObj != null)
-            {
-                fadeImage = fadeObj.GetComponent<UnityEngine.UI.Image>();
-            }
+            fadeImage.gameObject.SetActive(true);
+            Color c = fadeImage.color;
+            c.a = 0f;
+            fadeImage.color = c;
         }
-        if (fadeImage != null) { Color c = fadeImage.color; c.a = 0f; fadeImage.color = c; }
 
+        // AMANIN REFERENSI: Cari script pergerakan di objek utama atau anak-anaknya sekalian biar gak bocor
         if (arenPlayer != null)
         {
-            playerMovement = arenPlayer.GetComponent<PlayerMovement>() ?? arenPlayer.GetComponentInChildren<PlayerMovement>();
+            playerMovement = arenPlayer.GetComponent<PlayerMovement>();
+            if (playerMovement == null)
+            {
+                playerMovement = arenPlayer.GetComponentInChildren<PlayerMovement>();
+            }
         }
+
+        // Paksa lock di awal banget game dimulai
         SetMovement(false);
         RefreshDisplay();
     }
 
     void Update()
     {
+        if (isTransitioning)
+        {
+            isTransitioning = false;
+            return;
+        }
+
         if (sedangTungguLedakan && (Keyboard.current.spaceKey.wasPressedThisFrame || Pointer.current.press.wasPressedThisFrame))
         {
             sedangTungguLedakan = false;
@@ -79,90 +91,150 @@ public class DialogueManager : MonoBehaviour
 
         if (jenisDialogAktif == 4 && playerInTriggerPuzzle && Keyboard.current.eKey.wasPressedThisFrame)
         {
-            StartCoroutine(ProsesFadeLaluPindahScene("Puzzle_Jigsaw"));
+            StartCoroutine(ProsesFadeLaluPindahScene("BookWorldScene"));
         }
     }
 
     public void NextLine()
     {
         index++;
-        DialogueLine[] lines = GetActiveDialogueArray();
-        if (index < lines.Length) RefreshDisplay();
-        else CloseDialogue();
+        DialogueLine[] currentLines = GetActiveDialogueArray();
+
+        if (index < currentLines.Length)
+        {
+            RefreshDisplay();
+        }
+        else
+        {
+            CloseDialogue();
+        }
+    }
+
+    DialogueLine[] GetActiveDialogueArray()
+    {
+        if (jenisDialogAktif == 0) return bookLines;
+        if (jenisDialogAktif == 1) return introLines;
+        if (jenisDialogAktif == 2) return dialogPanjangLuma;
+        if (jenisDialogAktif == 3) return dialogGerbangRusak;
+        return introLines;
     }
 
     void RefreshDisplay()
     {
-        DialogueLine[] lines = GetActiveDialogueArray();
-        if (lines == null || lines.Length == 0) return;
+        DialogueLine[] currentLines = GetActiveDialogueArray();
+        if (currentLines == null || currentLines.Length == 0) return;
 
-        if (index < lines.Length && dialogueText != null)
+        if (index < currentLines.Length && dialogueText != null)
         {
-            string p = !string.IsNullOrEmpty(lines[index].speaker) ? lines[index].speaker + ": " : "";
-            dialogueText.text = p + lines[index].text;
-
-            if (petunjukPanel != null) { petunjukPanel.SetActive(true); petunjukText.text = "Tekan SPACE untuk lanjut"; }
-
-            if (jenisDialogAktif == 2 && index == indexTriggerKedapKedip && overlaySimbolPecah != null)
-                StartCoroutine(EfekKedapKedip(overlaySimbolPecah));
+            string pembicara = !string.IsNullOrEmpty(currentLines[index].speaker) ? currentLines[index].speaker + ": " : "";
+            dialogueText.text = pembicara + currentLines[index].text;
         }
     }
 
     void CloseDialogue()
     {
         dialogueActive = false;
-        if (petunjukPanel != null) petunjukPanel.SetActive(false);
-        if (dialoguePanel != null) dialoguePanel.SetActive(false);
 
-        if (jenisDialogAktif == 1) { jenisDialogAktif = 5; SetMovement(true); StartCoroutine(TampilkanPetunjukSementara("Gunakan A & D untuk berjalan!", 3f)); }
-        else if (jenisDialogAktif == 2) { sedangTungguLedakan = true; }
-        else if (jenisDialogAktif == 3) { jenisDialogAktif = 4; SetMovement(true); }
-        else if (jenisDialogAktif == 0) { StartCoroutine(JedaDanMulaiFade()); }
+        if (jenisDialogAktif == 1)
+        {
+            if (dialoguePanel != null) dialoguePanel.SetActive(false);
+            jenisDialogAktif = 5;
+
+            // UNLOCK: Narasi intro beres, player di kedua scene bebas jalan ke trigger masing-masing!
+            SetMovement(true);
+            Debug.Log("Sistem: Narasi awal selesai, Player di-UNLOCK.");
+        }
+        else if (jenisDialogAktif == 2)
+        {
+            if (dialoguePanel != null) dialoguePanel.SetActive(false);
+            if (overlaySimbolPecah != null) overlaySimbolPecah.SetActive(true);
+            sedangTungguLedakan = true;
+        }
+        else if (jenisDialogAktif == 3)
+        {
+            if (dialoguePanel != null) dialoguePanel.SetActive(false);
+            jenisDialogAktif = 4;
+            SetMovement(true);
+        }
+        else if (jenisDialogAktif == 0)
+        {
+            if (dialoguePanel != null) dialoguePanel.SetActive(false);
+            dialogueActive = false;
+
+            Debug.Log("Sistem: Dialog perpus selesai. Jalankan Jeda Input...");
+            StartCoroutine(JedaDanMulaiFade());
+        }
     }
 
-    public void MemicuPertemuanLuma() { SetMovement(false); jenisDialogAktif = 2; index = 0; dialogueActive = true; if (dialoguePanel != null) dialoguePanel.SetActive(true); RefreshDisplay(); }
-
-    public void StartBookDialogue()
+    public void MemicuPertemuanLuma()
     {
         SetMovement(false);
-        jenisDialogAktif = 0;
+        jenisDialogAktif = 2;
         index = 0;
         dialogueActive = true;
+        isTransitioning = true;
         if (dialoguePanel != null) dialoguePanel.SetActive(true);
         RefreshDisplay();
     }
 
-    void MemicuGerbangMacet() { jenisDialogAktif = 3; index = 0; dialogueActive = true; if (dialoguePanel != null) dialoguePanel.SetActive(true); RefreshDisplay(); }
-
-    public void SetPlayerDiAreaPuzzle(bool diArea) { playerInTriggerPuzzle = diArea; }
-    void SetMovement(bool bisaGerak) { if (playerMovement != null) playerMovement.canMove = bisaGerak; }
-
-    DialogueLine[] GetActiveDialogueArray()
+    void MemicuGerbangMacet()
     {
-        if (jenisDialogAktif == 0) return bookLines;
-        if (jenisDialogAktif == 2) return dialogPanjangLuma;
-        if (jenisDialogAktif == 3) return dialogGerbangRusak;
-        return introLines;
+        jenisDialogAktif = 3;
+        index = 0;
+        dialogueActive = true;
+        isTransitioning = true;
+        if (dialoguePanel != null) dialoguePanel.SetActive(true);
+        RefreshDisplay();
     }
 
-    IEnumerator TampilkanPetunjukSementara(string pesan, float durasi)
+    public void SetPlayerDiAreaPuzzle(bool diArea)
     {
-        if (petunjukPanel != null) { petunjukPanel.SetActive(true); petunjukText.text = pesan; yield return new WaitForSeconds(durasi); petunjukPanel.SetActive(false); }
+        playerInTriggerPuzzle = diArea;
     }
 
-    IEnumerator EfekKedapKedip(GameObject obj)
+    void SetMovement(bool bisaGerak)
     {
-        Image img = obj.GetComponent<Image>();
-        if (img == null) yield break;
-        obj.SetActive(true);
-        for (int i = 0; i < 3; i++)
+        if (playerMovement != null) playerMovement.canMove = bisaGerak;
+    }
+
+    public void StartBookDialogue()
+    {
+        index = 0;
+        jenisDialogAktif = 0;
+        dialogueActive = true;
+        if (dialoguePanel != null) dialoguePanel.SetActive(true);
+        RefreshDisplay();
+        SetMovement(false);
+    }
+
+    IEnumerator JedaDanMulaiFade()
+    {
+        yield return new WaitForSecondsRealtime(0.2f);
+        StartCoroutine(ProsesFadeLaluPindahScene("BookWorldScene"));
+    }
+
+    IEnumerator ProsesFadeLaluPindahScene(string namaSceneTujuan)
+    {
+        SetMovement(false);
+
+        if (fadeImage != null)
         {
-            for (float a = 0; a <= 1; a += 0.1f) { img.color = new Color(img.color.r, img.color.g, img.color.b, a); yield return new WaitForSeconds(0.05f); }
-            for (float a = 1; a >= 0; a -= 0.1f) { img.color = new Color(img.color.r, img.color.g, img.color.b, a); yield return new WaitForSeconds(0.05f); }
+            Color warnaSekarang = fadeImage.color;
+            warnaSekarang.a = 0f;
+            fadeImage.color = warnaSekarang;
+
+            while (fadeImage.color.a < 1f)
+            {
+                warnaSekarang.a += Time.unscaledDeltaTime * kecepatanFade;
+                fadeImage.color = warnaSekarang;
+                yield return null;
+            }
+
+            warnaSekarang.a = 1f;
+            fadeImage.color = warnaSekarang;
         }
+
+        yield return new WaitForSecondsRealtime(0.5f);
+        SceneManager.LoadScene(namaSceneTujuan);
     }
-
-    IEnumerator JedaDanMulaiFade() { yield return new WaitForSecondsRealtime(0.2f); StartCoroutine(ProsesFadeLaluPindahScene("BookWorldScene")); }
-
-    IEnumerator ProsesFadeLaluPindahScene(string n) { SetMovement(false); if (fadeImage != null) { Color w = fadeImage.color; w.a = 0; while (w.a < 1) { w.a += Time.unscaledDeltaTime * kecepatanFade; fadeImage.color = w; yield return null; } } yield return new WaitForSecondsRealtime(0.5f); SceneManager.LoadScene(n); }
 }

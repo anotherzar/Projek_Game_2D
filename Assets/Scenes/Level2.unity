@@ -274,8 +274,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: New Text
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 7d77689ebf451da478e14fb03048d722, type: 2}
-  m_sharedMaterial: {fileID: -2714252290829473036, guid: 7d77689ebf451da478e14fb03048d722, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1222,29 +1222,9 @@ MonoBehaviour:
   bgFragments: {fileID: 853221136}
   playerMovement: {fileID: 1432745308}
   lumaFollow: {fileID: 716343740}
-  introLines:
-  - speaker: narasi
-    text: Mereka memasuki area yang jauh lebih gelap.
-  - speaker: Aren
-    text: '"Tulisan di sini hilang semua..."'
-  - speaker: Luma
-    text: ' "Jika sebuah bagian cerita dilupakan... maka isi halamannya ikut menghilang." '
-  childLines:
-  - speaker: child
-    text: '"Kak...?'
-  - speaker: child
-    text: '"Aku lupa rumahku di mana..."'
-  - speaker: child
-    text: '"Aku lupa siapa namaku..."'
-  endingLines:
-  - speaker: Luma
-    text: '"Karakter yang kehilangan cerita akan kehilangan ingatan mereka."'
-  - speaker: Aren
-    text: '"Kalau terus begini... semuanya bakal hilang kan?"'
-  - speaker: Luma
-    text: 'Luma: "Urutan ceritanya rusak."'
-  - speaker: Luma
-    text: '"Kalau kita bisa mengembalikannya... ingatan mereka mungkin kembali."'
+  introLines: []
+  childLines: []
+  endingLines: []
 --- !u!1 &1087845435
 GameObject:
   m_ObjectHideFlags: 0

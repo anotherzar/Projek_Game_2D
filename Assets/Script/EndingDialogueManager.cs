@@ -325,7 +325,8 @@ public class EndingDialogueManager : MonoBehaviour
     void EndDialogue()
     {
         dialoguePanel.SetActive(false);
-        UnityEngine.SceneManagement.SceneManager.LoadScene("main_menu");
+
+        Debug.Log("Ending selesai.");
     }
 
     // =========================

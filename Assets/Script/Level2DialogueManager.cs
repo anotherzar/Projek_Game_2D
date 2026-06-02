@@ -112,7 +112,8 @@ public class Level2DialogueManager : MonoBehaviour
             else
             {
                 dialoguePanel.SetActive(false);
-                UnityEngine.SceneManagement.SceneManager.LoadScene("Puzzle_Memory");
+
+                Debug.Log("Puzzle bisa dimulai.");
             }
         }
     }
