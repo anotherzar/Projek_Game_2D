@@ -1,3 +1,5 @@
+// PetunjukManager.cs
+// Bagian dari Fitur Main Menu
 using UnityEngine;
 using System.Collections;
 

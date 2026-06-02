@@ -1,3 +1,5 @@
+// MainMenuController.cs
+// Created by Rafli - Fitur Main Menu
 using UnityEngine;
 using UnityEngine.SceneManagement; // Wajib untuk memanipulasi perpindahan scene
 
