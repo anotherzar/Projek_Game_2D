@@ -96,7 +96,6 @@ public class JigsawManager : MonoBehaviour
 
         // Jika semua kepingan sudah di posisi masing-masing
         puzzleCompleted = true;
-        Debug.Log("LOG_WIN");
 
         // Aktifkan Win UI Panel jika ada
         if (winUIPanel != null)
