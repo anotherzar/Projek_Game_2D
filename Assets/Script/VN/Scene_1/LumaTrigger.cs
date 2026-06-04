@@ -11,6 +11,9 @@ public class LumaTrigger : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             playerDiDalamArea = true;
+            // Update tips petunjuk
+            DialogueManager manager = Object.FindFirstObjectByType<DialogueManager>();
+            if (manager != null) manager.SetPetunjukInteraksi(true);
             Debug.Log("Sistem: Aren sudah dekat Luma. Silakan tekan E untuk bicara!");
         }
     }
@@ -21,6 +24,9 @@ public class LumaTrigger : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             playerDiDalamArea = false;
+            // Update tips petunjuk
+            DialogueManager manager = Object.FindFirstObjectByType<DialogueManager>();
+            if (manager != null) manager.SetPetunjukInteraksi(false);
             Debug.Log("Sistem: Aren menjauh dari Luma.");
         }
     }

@@ -2,12 +2,18 @@ using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UI; // for Image UI
 
 public class EndingDialogueManager : MonoBehaviour
 {
     [Header("UI")]
     public GameObject dialoguePanel;
     public TextMeshProUGUI dialogueText;
+
+    [Header("Petunjuk Gambar References")]
+    public GameObject petunjukSpaceImage;   // Gambar untuk petunjuk Space (saat dialog)
+    public GameObject petunjukMoveImage;    // Gambar untuk petunjuk A/D (saat bergerak)
+    public GameObject petunjukInteractImage;// Gambar untuk petunjuk E (saat interaksi)
 
     [Header("White Flash")]
     public SpriteRenderer whiteFlash;
@@ -18,6 +24,13 @@ public class EndingDialogueManager : MonoBehaviour
     [Header("Characters")]
     public GameObject aren;
     public GameObject luma;
+
+    [Header("Name Box Images")]
+    public Image namaImageAren; 
+    public Image namaImageLuma; 
+    public Image namaImageChild; 
+    public Image namaImageShadowInk; 
+    public Image namaImageAnakKecil; 
 
     public GameObject lostChildSad;
     public GameObject lostChildHappy;
@@ -54,6 +67,7 @@ public class EndingDialogueManager : MonoBehaviour
         InitializeScene();
 
         StartIntroScene();
+        UpdatePetunjuk();
     }
 
     void Update()
@@ -68,12 +82,46 @@ public class EndingDialogueManager : MonoBehaviour
     void InitializeScene()
     {
         dialoguePanel.SetActive(true);
+        // Hide all name images at start
+        if (namaImageAren != null) namaImageAren.gameObject.SetActive(false);
+        if (namaImageLuma != null) namaImageLuma.gameObject.SetActive(false);
+        if (namaImageChild != null) namaImageChild.gameObject.SetActive(false);
+        if (namaImageShadowInk != null) namaImageShadowInk.gameObject.SetActive(false);
 
         SetupBackground();
 
         SetupCharacters();
 
         SetupEffects();
+
+        SetupSortingOrders();
+
+        // Ensure name images are assigned (fallback find by name)
+        // Fallback find name box images if not assigned
+        if (namaImageAren == null) {
+            var go = GameObject.Find("NamaBox_Aren");
+            if (go != null) namaImageAren = go.GetComponent<Image>();
+        }
+        if (namaImageLuma == null) {
+            var go = GameObject.Find("NamaBox_Luma");
+            if (go != null) namaImageLuma = go.GetComponent<Image>();
+        }
+        if (namaImageChild == null) {
+            var go = GameObject.Find("NamaBox_Child");
+            if (go != null) namaImageChild = go.GetComponent<Image>();
+        }
+        if (namaImageShadowInk == null) {
+            var go = GameObject.Find("NamaBox_ShadowInk");
+            if (go != null) namaImageShadowInk = go.GetComponent<Image>();
+        }
+        if (namaImageAnakKecil == null) {
+            var go = GameObject.Find("NamaBox_AnakKecil");
+            if (go != null) namaImageAnakKecil = go.GetComponent<Image>();
+        }
+        if (namaImageShadowInk == null) {
+            var go = GameObject.Find("NamaBox_ShadowInk");
+            if (go != null) namaImageShadowInk = go.GetComponent<Image>();
+        }
     }
 
     void SetupBackground()
@@ -86,8 +134,24 @@ public class EndingDialogueManager : MonoBehaviour
     void SetupCharacters()
     {
         lostChildSad.SetActive(true);
+        // Reset alpha of lostChildSad to 1
+        SpriteRenderer srSad = lostChildSad.GetComponent<SpriteRenderer>();
+        if (srSad != null)
+        {
+            Color c = srSad.color;
+            c.a = 1f;
+            srSad.color = c;
+        }
 
         lostChildHappy.SetActive(false);
+        // Reset alpha of lostChildHappy to 1
+        SpriteRenderer srHappy = lostChildHappy.GetComponent<SpriteRenderer>();
+        if (srHappy != null)
+        {
+            Color c = srHappy.color;
+            c.a = 1f;
+            srHappy.color = c;
+        }
 
         shadowInk.gameObject.SetActive(false);
     }
@@ -153,6 +217,7 @@ public class EndingDialogueManager : MonoBehaviour
                 HandleShadowDialogue();
                 break;
         }
+        UpdatePetunjuk();
     }
 
     // =========================
@@ -325,6 +390,7 @@ public class EndingDialogueManager : MonoBehaviour
     void EndDialogue()
     {
         dialoguePanel.SetActive(false);
+        UpdatePetunjuk();
         UnityEngine.SceneManagement.SceneManager.LoadScene("main_menu");
     }
 
@@ -380,6 +446,15 @@ public class EndingDialogueManager : MonoBehaviour
         bgLight.SetActive(true);
 
         lostChildSad.SetActive(false);
+
+        // Reset alpha of lostChildHappy to 1 before showing it
+        SpriteRenderer srHappy = lostChildHappy.GetComponent<SpriteRenderer>();
+        if (srHappy != null)
+        {
+            Color c = srHappy.color;
+            c.a = 1f;
+            srHappy.color = c;
+        }
 
         lostChildHappy.SetActive(true);
 
@@ -474,6 +549,117 @@ public class EndingDialogueManager : MonoBehaviour
         {
             dialogueText.text =
                 line.speaker + ": " + line.text;
+            UpdateNameImages(line.speaker);
+        }
+    }
+
+    // Update name box visibility based on speaker
+    void UpdateNameImages(string speaker)
+    {
+        // Hide all first
+        if (namaImageAren != null) namaImageAren.gameObject.SetActive(false);
+        if (namaImageLuma != null) namaImageLuma.gameObject.SetActive(false);
+        if (namaImageAnakKecil != null) namaImageAnakKecil.gameObject.SetActive(false);
+        if (namaImageShadowInk != null) namaImageShadowInk.gameObject.SetActive(false);
+
+        string spk = (speaker ?? "").Trim().ToLower();
+        if (spk == "aren")
+        {
+            if (namaImageAren != null) namaImageAren.gameObject.SetActive(true);
+        }
+        else if (spk == "luma")
+        {
+            if (namaImageLuma != null) namaImageLuma.gameObject.SetActive(true);
+        }
+        else if (spk == "child")
+        {
+            if (namaImageChild != null) namaImageChild.gameObject.SetActive(true);
+        }
+        else if (spk == "anak_kecil")
+        {
+            if (namaImageAnakKecil != null) namaImageAnakKecil.gameObject.SetActive(true);
+        }
+        else if (spk == "shadow_ink" || spk == "shadow ink")
+        {
+            if (namaImageShadowInk != null) namaImageShadowInk.gameObject.SetActive(true);
+        }
+    }
+
+    // === SISTEM SORTING ORDER ===
+    void SetupSortingOrders()
+    {
+        // 1. Backgrounds paling belakang
+        SetSortingOrder(bgCards, -50);
+        SetSortingOrder(bgLight, -50);
+
+        // 2. Karakter di depan background
+        SetSortingOrder(aren, 10);
+        SetSortingOrder(luma, 10);
+        SetSortingOrder(lostChildSad, 10);
+        SetSortingOrder(lostChildHappy, 10);
+
+        // 3. Efek-efek di depan karakter
+        if (shadowInk != null)
+        {
+            SetSortingOrder(shadowInk.gameObject, 20);
+        }
+        if (darkOverlay != null)
+        {
+            SetSortingOrder(darkOverlay.gameObject, 30);
+        }
+        if (whiteFlash != null)
+        {
+            SetSortingOrder(whiteFlash.gameObject, 100);
+        }
+    }
+
+    void SetSortingOrder(GameObject obj, int order)
+    {
+        if (obj == null) return;
+
+        // Coba di parent
+        SpriteRenderer sr = obj.GetComponent<SpriteRenderer>();
+        if (sr != null)
+        {
+            sr.sortingOrder = order;
+        }
+
+        // Untuk semua children-nya
+        SpriteRenderer[] srs = obj.GetComponentsInChildren<SpriteRenderer>(true);
+        foreach (SpriteRenderer childSr in srs)
+        {
+            childSr.sortingOrder = order;
+        }
+    }
+
+    // === SISTEM PETUNJUK/TIPS ===
+    private bool playerDiAreaInteraksi = false;
+
+    public void SetPetunjukInteraksi(bool diArea)
+    {
+        playerDiAreaInteraksi = diArea;
+        UpdatePetunjuk();
+    }
+
+    void UpdatePetunjuk()
+    {
+        // 1. Matikan semua petunjuk gambar terlebih dahulu
+        if (petunjukSpaceImage != null) petunjukSpaceImage.SetActive(false);
+        if (petunjukMoveImage != null) petunjukMoveImage.SetActive(false);
+        if (petunjukInteractImage != null) petunjukInteractImage.SetActive(false);
+
+        // 2. Tentukan state petunjuk yang aktif
+        bool dialogAktif = dialoguePanel != null && dialoguePanel.activeSelf;
+        bool interactAktif = !dialogAktif && playerDiAreaInteraksi;
+
+        // 3. Aktifkan petunjuk gambar sesuai state
+        if (dialogAktif)
+        {
+            if (petunjukSpaceImage != null) petunjukSpaceImage.SetActive(true);
+        }
+        else if (interactAktif)
+        {
+            if (petunjukInteractImage != null) petunjukInteractImage.SetActive(true);
         }
     }
 }

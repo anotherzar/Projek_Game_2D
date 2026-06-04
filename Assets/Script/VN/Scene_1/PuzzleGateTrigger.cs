@@ -21,6 +21,7 @@ public class PuzzleGateTrigger : MonoBehaviour
             if (dialogueManager != null)
             {
                 dialogueManager.SetPlayerDiAreaPuzzle(true);
+                dialogueManager.SetPetunjukInteraksi(true);
                 Debug.Log("Sistem: Aren berada di dekat gerbang puzzle. Siap menekan E!");
             }
         }
@@ -33,6 +34,7 @@ public class PuzzleGateTrigger : MonoBehaviour
             if (dialogueManager != null)
             {
                 dialogueManager.SetPlayerDiAreaPuzzle(false);
+                dialogueManager.SetPetunjukInteraksi(false);
                 Debug.Log("Sistem: Aren menjauh dari gerbang puzzle.");
             }
         }

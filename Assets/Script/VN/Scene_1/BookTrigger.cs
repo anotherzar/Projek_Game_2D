@@ -18,6 +18,8 @@ public class BookTrigger : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             playerDiAreaMeja = true;
+            // Update tips petunjuk
+            if (dialogueManager != null) dialogueManager.SetPetunjukInteraksi(true);
             Debug.Log("Sistem: Aren masuk area meja perpus. Siap pencet E.");
         }
     }
@@ -28,6 +30,8 @@ public class BookTrigger : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             playerDiAreaMeja = false;
+            // Update tips petunjuk
+            if (dialogueManager != null) dialogueManager.SetPetunjukInteraksi(false);
             Debug.Log("Sistem: Aren menjauh dari meja perpus.");
         }
     }
