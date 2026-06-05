@@ -328,6 +328,49 @@ public class DialogueManager : MonoBehaviour
     }
 
     IEnumerator JedaDanMulaiFade() { yield return new WaitForSecondsRealtime(0.2f); StartCoroutine(ProsesFadeLaluPindahScene("BookWorldScene")); }
+ 
+    IEnumerator ProsesFadeLaluPindahScene(string n)
+    {
+        SetMovement(false);
 
-    IEnumerator ProsesFadeLaluPindahScene(string n) { SetMovement(false); if (fadeImage != null) { Color w = fadeImage.color; w.a = 0; while (w.a < 1) { w.a += Time.unscaledDeltaTime * kecepatanFade; fadeImage.color = w; yield return null; } } yield return new WaitForSecondsRealtime(0.5f); SceneManager.LoadScene(n); }
+        // 1. Buat Canvas Transisi secara dinamis
+        GameObject canvasGo = new GameObject("TransitionCanvas");
+        int uiLayer = LayerMask.NameToLayer("UI");
+        if (uiLayer != -1) canvasGo.layer = uiLayer;
+
+        Canvas canvas = canvasGo.AddComponent<Canvas>();
+        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+        canvas.sortingOrder = 999999; // Sangat tinggi agar di atas UI apa pun
+        canvasGo.AddComponent<CanvasScaler>();
+        canvasGo.AddComponent<GraphicRaycaster>(); // Agar memblokir klik/sentuhan saat transisi
+        
+        // Jangan dihancurkan saat ganti scene
+        DontDestroyOnLoad(canvasGo);
+
+        // 2. Buat Image putih di dalam Canvas
+        GameObject imageGo = new GameObject("FadeImage");
+        if (uiLayer != -1) imageGo.layer = uiLayer;
+        imageGo.transform.SetParent(canvasGo.transform, false);
+        Image fadeImg = imageGo.AddComponent<Image>();
+        fadeImg.color = new Color(1f, 1f, 1f, 0f); // Transparan putih di awal
+
+        // Atur rect transform agar menutupi seluruh layar
+        RectTransform rect = fadeImg.rectTransform;
+        rect.anchorMin = Vector2.zero;
+        rect.anchorMax = Vector2.one;
+        rect.offsetMin = Vector2.zero;
+        rect.offsetMax = Vector2.one;
+
+        // 3. Hitung durasi fade berdasarkan kecepatanFade
+        float fadeDur = kecepatanFade > 0f ? (1f / kecepatanFade) : 1.0f;
+
+        // 4. Tambahkan helper component ke Canvas yang tidak hancur saat ganti scene
+        TransitionHelper helper = canvasGo.AddComponent<TransitionHelper>();
+        helper.nextSceneName = n;
+        helper.fadeDuration = fadeDur;
+        helper.fadeImage = fadeImg;
+        helper.StartTransition();
+
+        yield break;
+    }
 }

@@ -1,5 +1,7 @@
 using UnityEngine;
 using System.Collections;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class JigsawManager : MonoBehaviour
 {
@@ -20,8 +22,21 @@ public class JigsawManager : MonoBehaviour
     [Tooltip("UI Panel yang akan diaktifkan secara otomatis saat puzzle selesai.")]
     public GameObject winUIPanel;
 
+    [Header("Scene Transition Settings")]
+    [Tooltip("Nama scene berikutnya yang akan diload setelah puzzle selesai.")]
+    public string nextSceneName = "Level2";
+    [Tooltip("Durasi transisi fade (ke putih dan kembali ke transparan) dalam detik.")]
+    public float fadeDuration = 1.0f;
+
+    [Header("Audio Settings")]
+    [Tooltip("Lagu latar belakang (BGM) untuk puzzle Jigsaw.")]
+    public AudioClip bgmClip;
+    [Tooltip("SFX yang dimainkan saat semua kepingan puzzle selesai disusun.")]
+    public AudioClip winSFX;
+
     private JigsawPiece[] pieces;
     private bool puzzleCompleted = false;
+    private AudioSource audioSource;
 
     private void Start()
     {
@@ -38,6 +53,38 @@ public class JigsawManager : MonoBehaviour
         {
             winUIPanel.SetActive(false);
         }
+
+        // Set up AudioSource component
+        audioSource = GetComponent<AudioSource>();
+        if (audioSource == null)
+        {
+            audioSource = gameObject.AddComponent<AudioSource>();
+            audioSource.playOnAwake = false;
+            audioSource.spatialBlend = 0f; // Set ke 2D sound
+        }
+
+        // Putar BGM secara looping dengan fade in
+        if (bgmClip != null)
+        {
+            audioSource.clip = bgmClip;
+            audioSource.loop = true;
+            audioSource.Play();
+            StartCoroutine(FadeInBGM(fadeDuration, 0.8f));
+        }
+    }
+
+    private IEnumerator FadeInBGM(float duration, float targetVolume)
+    {
+        if (audioSource == null || bgmClip == null) yield break;
+        audioSource.volume = 0f;
+        float elapsed = 0f;
+        while (elapsed < duration)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            audioSource.volume = Mathf.Lerp(0f, targetVolume, elapsed / duration);
+            yield return null;
+        }
+        audioSource.volume = targetVolume;
     }
 
     private void Update()
@@ -98,6 +145,13 @@ public class JigsawManager : MonoBehaviour
         puzzleCompleted = true;
         Debug.Log("LOG_WIN");
 
+        // Mainkan SFX kemenangan jika diisi
+        if (winSFX != null && audioSource != null)
+        {
+            // PlayOneShot agar tidak memutus BGM sebelum pindah scene
+            audioSource.PlayOneShot(winSFX);
+        }
+
         // Aktifkan Win UI Panel jika ada
         if (winUIPanel != null)
         {
@@ -108,14 +162,139 @@ public class JigsawManager : MonoBehaviour
         StartCoroutine(AutoLoadNextSceneRoutine());
     }
 
+    private IEnumerator FadeOutAllLoopingAudio(float duration)
+    {
+        AudioSource[] sources = FindObjectsByType<AudioSource>(FindObjectsSortMode.None);
+        if (sources == null || sources.Length == 0) yield break;
+
+        // Simpan volume awal untuk semua AudioSource yang sedang play dan looping
+        System.Collections.Generic.Dictionary<AudioSource, float> startVolumes = new System.Collections.Generic.Dictionary<AudioSource, float>();
+        foreach (var src in sources)
+        {
+            if (src != null && src.isPlaying && src.loop)
+            {
+                startVolumes[src] = src.volume;
+            }
+        }
+
+        float elapsed = 0f;
+        while (elapsed < duration)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            float t = elapsed / duration;
+            foreach (var kvp in startVolumes)
+            {
+                if (kvp.Key != null)
+                {
+                    kvp.Key.volume = Mathf.Lerp(kvp.Value, 0f, t);
+                }
+            }
+            yield return null;
+        }
+
+        foreach (var kvp in startVolumes)
+        {
+            if (kvp.Key != null)
+            {
+                kvp.Key.volume = 0f;
+                kvp.Key.Stop();
+            }
+        }
+    }
+
     private IEnumerator AutoLoadNextSceneRoutine()
     {
-        yield return new WaitForSecondsRealtime(2.0f);
-        LoadNextScene();
+        // Tunggu 0.5 detik setelah menang (sesuai jeda)
+        yield return new WaitForSecondsRealtime(0.5f);
+
+        // Memudarkan semua BGM looping di scene
+        StartCoroutine(FadeOutAllLoopingAudio(fadeDuration));
+        
+        // 1. Buat Canvas Transisi secara dinamis
+        GameObject canvasGo = new GameObject("TransitionCanvas");
+        int uiLayer = LayerMask.NameToLayer("UI");
+        if (uiLayer != -1) canvasGo.layer = uiLayer;
+
+        Canvas canvas = canvasGo.AddComponent<Canvas>();
+        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+        canvas.sortingOrder = 999999; // Sangat tinggi agar di atas UI apa pun
+        canvasGo.AddComponent<CanvasScaler>();
+        canvasGo.AddComponent<GraphicRaycaster>(); // Agar memblokir klik/sentuhan saat transisi
+        
+        // Jangan dihancurkan saat ganti scene
+        DontDestroyOnLoad(canvasGo);
+
+        // 2. Buat Image putih di dalam Canvas
+        GameObject imageGo = new GameObject("FadeImage");
+        if (uiLayer != -1) imageGo.layer = uiLayer;
+        imageGo.transform.SetParent(canvasGo.transform, false);
+        Image fadeImage = imageGo.AddComponent<Image>();
+        fadeImage.color = new Color(1f, 1f, 1f, 0f); // Transparan putih di awal
+
+        // Atur rect transform agar menutupi seluruh layar
+        RectTransform rect = fadeImage.rectTransform;
+        rect.anchorMin = Vector2.zero;
+        rect.anchorMax = Vector2.one;
+        rect.offsetMin = Vector2.zero;
+        rect.offsetMax = Vector2.one;
+
+        // 3. Tambahkan helper component ke Canvas yang tidak hancur saat ganti scene
+        TransitionHelper helper = canvasGo.AddComponent<TransitionHelper>();
+        helper.nextSceneName = nextSceneName;
+        helper.fadeDuration = fadeDuration;
+        helper.fadeImage = fadeImage;
+        helper.StartTransition();
     }
 
     public void LoadNextScene()
     {
-        UnityEngine.SceneManagement.SceneManager.LoadScene("Level2");
+        StartCoroutine(AutoLoadNextSceneRoutine());
+    }
+}
+
+// Helper Class untuk menjalankan Coroutine transisi lintas scene
+public class TransitionHelper : MonoBehaviour
+{
+    public string nextSceneName;
+    public float fadeDuration;
+    public Image fadeImage;
+
+    public void StartTransition()
+    {
+        StartCoroutine(TransitionRoutine());
+    }
+
+    private IEnumerator TransitionRoutine()
+    {
+        // 1. Fade ke Putih (Alpha 0 -> 1)
+        float elapsed = 0f;
+        while (elapsed < fadeDuration)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            float alpha = Mathf.Clamp01(elapsed / fadeDuration);
+            fadeImage.color = new Color(1f, 1f, 1f, alpha);
+            yield return null;
+        }
+        fadeImage.color = Color.white;
+
+        // 2. Load Scene secara Asynchronous
+        AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(nextSceneName);
+        while (!asyncLoad.isDone)
+        {
+            yield return null;
+        }
+
+        // 3. Fade dari Putih (Alpha 1 -> 0) di scene baru
+        elapsed = 0f;
+        while (elapsed < fadeDuration)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            float alpha = Mathf.Clamp01(1f - (elapsed / fadeDuration));
+            fadeImage.color = new Color(1f, 1f, 1f, alpha);
+            yield return null;
+        }
+
+        // 4. Hancurkan Canvas Transisi setelah selesai
+        Destroy(gameObject);
     }
 }
