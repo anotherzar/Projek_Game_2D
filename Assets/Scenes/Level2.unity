@@ -1736,6 +1736,13 @@ MonoBehaviour:
     text: 'Luma: "Urutan ceritanya rusak."'
   - speaker: Luma
     text: '"Kalau kita bisa mengembalikannya... ingatan mereka mungkin kembali."'
+  audioSource: {fileID: 0}
+  bgmVolume: 0.5
+  sfxVolume: 1
+  bgmLevel: {fileID: 8300000, guid: 806ac74e283c27944af10cdac2ff12ff, type: 3}
+  sfxShadowinkMuncul: {fileID: 0}
+  sfxShadowinkHilang: {fileID: 0}
+  sfxBukuTerbang: {fileID: 8300000, guid: 0c9d358d4ba28fa409b7b165f70de642, type: 3}
 --- !u!1 &1087845435
 GameObject:
   m_ObjectHideFlags: 0

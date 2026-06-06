@@ -27,7 +27,7 @@ EditorBuildSettings:
     path: Assets/Scenes/Scene_Puzzle/Puzzle_Memory.unity
     guid: 4e68b017db5ca484d894e8f1472601c1
   - enabled: 1
-    path: Assets/Scenes/Level2_Scene2.unity
+    path: Assets/Scenes/Level2_Page2.unity
     guid: 16647358c4449cc4ab2cf203f61fa44f
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}

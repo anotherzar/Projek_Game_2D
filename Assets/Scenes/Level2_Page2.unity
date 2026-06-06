@@ -2168,6 +2168,12 @@ MonoBehaviour:
     text: '"Shadow Ink..."'
   - speaker: Luma
     text: '"Dia mulai mendekat."'
+  audioSource: {fileID: 0}
+  bgmVolume: 0.5
+  sfxVolume: 1
+  bgmLevel: {fileID: 8300000, guid: 806ac74e283c27944af10cdac2ff12ff, type: 3}
+  sfxShadowinkMuncul: {fileID: 8300000, guid: f268022dd7efee740a8bc9acc5597f8e, type: 3}
+  sfxShadowinkHilang: {fileID: 8300000, guid: 7273079b09b9b614c9483ed215489c50, type: 3}
 --- !u!4 &1959285356
 Transform:
   m_ObjectHideFlags: 0

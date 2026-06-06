@@ -133,6 +133,6 @@ public class MemoryManager : MonoBehaviour
 
     public void LoadNextScene()
     {
-        UnityEngine.SceneManagement.SceneManager.LoadScene("Level2_Scene2");
+        UnityEngine.SceneManagement.SceneManager.LoadScene("Level2_Page2");
     }
 }
