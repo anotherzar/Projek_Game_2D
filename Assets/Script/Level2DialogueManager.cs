@@ -3,6 +3,7 @@ using TMPro;
 using UnityEngine.InputSystem;
 using System.Collections;
 using UnityEngine.UI; // for Image UI components
+using UnityEngine.SceneManagement;
 
 public class Level2DialogueManager : MonoBehaviour
 {
@@ -45,6 +46,14 @@ public class Level2DialogueManager : MonoBehaviour
 
     [Header("Ending Dialogue")]
     public DialogueLine[] endingLines;
+
+    [Header("Transisi Scene")]
+    [Tooltip("Image overlay hitam untuk efek fade. Buat UI Image warna hitam, set Alpha=0, lalu assign ke sini.")]
+    public Image fadeOverlay;
+    [Tooltip("Durasi fade out ke hitam sebelum pindah scene (detik)")]
+    public float fadeDuration = 1.2f;
+    [Tooltip("Nama scene tujuan setelah ending dialogue selesai")]
+    public string sceneEnding = "Ending_1";
 
     [Header("Audio Settings")]
     public AudioSource audioSource;
@@ -204,7 +213,7 @@ public class Level2DialogueManager : MonoBehaviour
             else
             {
                 dialoguePanel.SetActive(false);
-                UnityEngine.SceneManagement.SceneManager.LoadScene("Puzzle_Memory");
+                StartCoroutine(TransisiKeEnding());
             }
         }
         UpdatePetunjuk();
@@ -284,6 +293,84 @@ public class Level2DialogueManager : MonoBehaviour
 
         DisplayLine(endingLines[index]);
         UpdatePetunjuk();
+    }
+
+    IEnumerator TransisiKeEnding()
+    {
+        Debug.Log("[Level2DialogueManager] Memulai transisi ke scene: " + sceneEnding);
+
+        // Validasi scene ada di Build Settings
+        bool sceneValid = false;
+        for (int i = 0; i < UnityEngine.SceneManagement.SceneManager.sceneCountInBuildSettings; i++)
+        {
+            string path = UnityEngine.SceneManagement.SceneUtility.GetScenePathByBuildIndex(i);
+            string name = System.IO.Path.GetFileNameWithoutExtension(path);
+            if (name == sceneEnding)
+            {
+                sceneValid = true;
+                break;
+            }
+        }
+
+        if (!sceneValid)
+        {
+            Debug.LogError("[Level2DialogueManager] Scene '" + sceneEnding + "' TIDAK ditemukan di Build Settings! Tambahkan dulu via File > Build Settings > Add Open Scenes.");
+            yield break;
+        }
+
+        // BGM DIBIARKAN TERUS JALAN agar nyambung ke scene Ending_1
+        // AudioManager pakai DontDestroyOnLoad, jadi musik tidak terputus saat ganti scene
+        Debug.Log("[Level2DialogueManager] BGM tetap berjalan, nyambung ke " + sceneEnding);
+
+        // Auto-create overlay hitam jika belum di-assign
+        if (fadeOverlay == null)
+        {
+            GameObject canvasGo = new GameObject("AutoFadeCanvas");
+            Canvas canvas = canvasGo.AddComponent<Canvas>();
+            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+            canvas.sortingOrder = 9999; // Pastikan paling atas
+
+            GameObject imageGo = new GameObject("FadeImage");
+            imageGo.transform.SetParent(canvasGo.transform, false);
+            fadeOverlay = imageGo.AddComponent<Image>();
+            fadeOverlay.color = new Color(0f, 0f, 0f, 0f);
+
+            RectTransform rect = fadeOverlay.rectTransform;
+            rect.anchorMin = Vector2.zero;
+            rect.anchorMax = Vector2.one;
+            rect.offsetMin = Vector2.zero;
+            rect.offsetMax = Vector2.zero;
+            rect.sizeDelta = Vector2.zero;
+        }
+
+        // Jika ada overlay fade, lakukan fade to black
+        if (fadeOverlay != null)
+        {
+            fadeOverlay.gameObject.SetActive(true);
+            float elapsed = 0f;
+            Color c = fadeOverlay.color;
+            c.a = 0f;
+            fadeOverlay.color = c;
+
+            while (elapsed < fadeDuration)
+            {
+                elapsed += Time.deltaTime;
+                c.a = Mathf.Clamp01(elapsed / fadeDuration);
+                fadeOverlay.color = c;
+                yield return null;
+            }
+
+            c.a = 1f;
+            fadeOverlay.color = c;
+        }
+        else
+        {
+            // Tidak ada overlay, tunggu sebentar saja
+            yield return new WaitForSeconds(0.5f);
+        }
+
+        // Pindah ke scene Ending_1
+        SceneManager.LoadScene(sceneEnding);
     }
 
     IEnumerator FadeBackground()

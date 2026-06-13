@@ -1736,6 +1736,9 @@ MonoBehaviour:
     text: 'Luma: "Urutan ceritanya rusak."'
   - speaker: Luma
     text: '"Kalau kita bisa mengembalikannya... ingatan mereka mungkin kembali."'
+  fadeOverlay: {fileID: 0}
+  fadeDuration: 1.2
+  sceneEnding: Puzzle_Memory
   audioSource: {fileID: 0}
   bgmVolume: 0.5
   sfxVolume: 1
