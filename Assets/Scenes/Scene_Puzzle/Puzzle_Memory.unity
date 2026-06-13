@@ -603,7 +603,7 @@ Canvas:
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 1
   m_TargetDisplay: 0
 --- !u!224 &801923982
 RectTransform:
@@ -897,6 +897,9 @@ MonoBehaviour:
   button: {fileID: 0}
   cardID: 0
   isPlaced: 0
+  clickSFX: {fileID: 8300000, guid: e8fdce77b00a81b4f979529e78175286, type: 3}
+  dragSFX: {fileID: 8300000, guid: 4ca3324e3ed03ac43a1a5fa5c70b20c2, type: 3}
+  snapSFX: {fileID: 8300000, guid: 33bded4d1dfc56047bb45aa6c50b4daf, type: 3}
 --- !u!225 &1951614265
 CanvasGroup:
   m_ObjectHideFlags: 0

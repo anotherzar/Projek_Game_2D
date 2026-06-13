@@ -4,7 +4,7 @@ using UnityEngine.EventSystems;
 using System.Collections;
 
 [RequireComponent(typeof(CanvasGroup))]
-public class MemoryCard : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
+public class MemoryCard : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler, IPointerDownHandler
 {
     [Header("UI Elements")]
     public GameObject cardBack;
@@ -16,6 +16,11 @@ public class MemoryCard : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
     public int cardID;
     public bool isPlaced = false;
 
+    [Header("SFX Settings")]
+    public AudioClip clickSFX;
+    public AudioClip dragSFX;
+    public AudioClip snapSFX;
+
     private MemoryManager manager;
     private Canvas canvas;
     private RectTransform rectTransform;
@@ -24,6 +29,7 @@ public class MemoryCard : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
     private Vector2 originalPosition;
     private Transform originalParent;
     private Transform tempDragParent;
+    private AudioSource audioSource;
 
     public void Setup(int id, Sprite sprite, MemoryManager mgr, Transform dragParent)
     {
@@ -80,9 +86,34 @@ public class MemoryCard : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
         if (cardFront != null) cardFront.SetActive(false);
     }
 
+    private void Start()
+    {
+        audioSource = GetComponent<AudioSource>();
+        if (audioSource == null)
+        {
+            audioSource = gameObject.AddComponent<AudioSource>();
+            audioSource.playOnAwake = false;
+            audioSource.spatialBlend = 0f;
+        }
+    }
+
+    public void OnPointerDown(PointerEventData eventData)
+    {
+        if (isPlaced) return;
+        if (clickSFX != null && audioSource != null)
+        {
+            audioSource.PlayOneShot(clickSFX);
+        }
+    }
+
     public void OnBeginDrag(PointerEventData eventData)
     {
         if (isPlaced) return;
+
+        if (dragSFX != null && audioSource != null)
+        {
+            audioSource.PlayOneShot(dragSFX);
+        }
 
         originalPosition = rectTransform.anchoredPosition;
         originalParent = transform.parent;
@@ -134,6 +165,11 @@ public class MemoryCard : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
             canvasGroup.blocksRaycasts = false;
         }
         
+        if (snapSFX != null && audioSource != null)
+        {
+            audioSource.PlayOneShot(snapSFX);
+        }
+
         transform.SetParent(targetSlot);
         
         rectTransform.anchorMin = new Vector2(0.5f, 0.5f);
@@ -176,4 +212,16 @@ public class MemoryCard : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
 
         rectTransform.anchoredPosition = targetPos;
     }
+
+#if UNITY_EDITOR
+    private void OnValidate()
+    {
+        if (clickSFX == null)
+            clickSFX = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/Project/Audio/SFX/Puzzle_Card/kartu diklik.mp3");
+        if (dragSFX == null)
+            dragSFX = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/Project/Audio/SFX/Puzzle_Card/kartu digeser.mp3");
+        if (snapSFX == null)
+            snapSFX = UnityEditor.AssetDatabase.LoadAssetAtPath<AudioClip>("Assets/Project/Audio/SFX/Puzzle_Card/kartu dipasang.mp3");
+    }
+#endif
 }

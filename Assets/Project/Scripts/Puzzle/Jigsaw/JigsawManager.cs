@@ -63,6 +63,12 @@ public class JigsawManager : MonoBehaviour
             audioSource.spatialBlend = 0f; // Set ke 2D sound
         }
 
+        // Hentikan BGM dari scene sebelumnya jika ada AudioManager global untuk menghindari double BGM
+        if (AudioManager.instance != null)
+        {
+            AudioManager.instance.StopBGM();
+        }
+
         // Putar BGM secara looping dengan fade in
         if (bgmClip != null)
         {
