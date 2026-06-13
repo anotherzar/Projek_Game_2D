@@ -2168,6 +2168,7 @@ MonoBehaviour:
     text: '"Shadow Ink..."'
   - speaker: Luma
     text: '"Dia mulai mendekat."'
+  sceneEnding: Ending_1
   audioSource: {fileID: 0}
   bgmVolume: 0.5
   sfxVolume: 1

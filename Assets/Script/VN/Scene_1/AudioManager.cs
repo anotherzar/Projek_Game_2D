@@ -41,4 +41,10 @@ public class AudioManager : MonoBehaviour
     {
         musicSource.Stop();
     }
+
+    // Cek apakah sedang ada musik yang dimainkan
+    public bool IsPlaying()
+    {
+        return musicSource != null && musicSource.isPlaying;
+    }
 }
