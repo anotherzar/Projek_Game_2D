@@ -18,6 +18,12 @@ public class DialogueManager : MonoBehaviour
     public GameObject petunjukSpaceImage;   // Gambar untuk petunjuk Space (saat dialog)
     public GameObject petunjukMoveImage;    // Gambar untuk petunjuk A/D (saat bergerak)
     public GameObject petunjukInteractImage;// Gambar untuk petunjuk E (saat interaksi)
+    
+    [Header("Petunjuk Panah Mengambang")]
+    public GameObject petunjukPanah;
+    public float panahFloatAmplitude = 10f;
+    public float panahFloatSpeed = 4f;
+    private Vector2 panahStartPos;
 
     [Header("Legacy UI Reference (Optional)")]
     public GameObject petunjukPanel;
@@ -113,6 +119,12 @@ public class DialogueManager : MonoBehaviour
         if (namaImageLuma != null) namaImageLuma.gameObject.SetActive(false);
         if (petunjukPanel != null) petunjukPanel.SetActive(false);
 
+        if (petunjukPanah != null)
+        {
+            RectTransform rt = petunjukPanah.GetComponent<RectTransform>();
+            if (rt != null) panahStartPos = rt.anchoredPosition;
+        }
+
         if (fadeImage == null)
         {
             GameObject fadeObj = GameObject.Find("FadePanel_baru") ?? GameObject.Find("FadePanel") ?? GameObject.Find("FadeImage");
@@ -147,6 +159,17 @@ public class DialogueManager : MonoBehaviour
 
     void Update()
     {
+        // Animasi mengambang untuk panah
+        if (petunjukPanah != null && petunjukPanah.activeInHierarchy)
+        {
+            RectTransform rt = petunjukPanah.GetComponent<RectTransform>();
+            if (rt != null)
+            {
+                float newY = panahStartPos.y + Mathf.Sin(Time.time * panahFloatSpeed) * panahFloatAmplitude;
+                rt.anchoredPosition = new Vector2(panahStartPos.x, newY);
+            }
+        }
+
         if (sedangTungguLedakan && (Keyboard.current.spaceKey.wasPressedThisFrame || Pointer.current.press.wasPressedThisFrame))
         {
             sedangTungguLedakan = false;
@@ -328,6 +351,14 @@ public class DialogueManager : MonoBehaviour
         bool spaceAktif = dialogueActive;
         bool interactAktif = !dialogueActive && (playerDiAreaInteraksi || playerInTriggerPuzzle);
         bool moveAktif = !dialogueActive && !interactAktif && (playerMovement != null && playerMovement.canMove);
+
+        // Atur visibilitas panah mengambang
+        // Muncul saat tooltipAD (moveAktif) atau tooltipE (interactAktif). 
+        // Hilang saat E dipencet (dialogueActive jadi true, interactAktif/moveAktif jadi false)
+        if (petunjukPanah != null)
+        {
+            petunjukPanah.SetActive(moveAktif || interactAktif);
+        }
 
         // 3. Aktifkan petunjuk gambar sesuai state
         if (spaceAktif)

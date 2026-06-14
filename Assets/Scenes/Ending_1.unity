@@ -569,9 +569,9 @@ MonoBehaviour:
   jumlahKedip: 5
   kecepatanKedip: 0.15
   targetScale: 3
-  durasiAnimasi: 1
+  durasiAnimasi: 0.5
   useSmoothStep: 1
-  durasiFadeOut: 0.5
+  durasiFadeOut: 3
   backgroundSprite: {fileID: 690750335}
   backgroundImage: {fileID: 0}
   targetCamera: {fileID: 1389246825}
