@@ -27,6 +27,8 @@ public class MemoryCard : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
     private CanvasGroup canvasGroup;
     
     private Vector2 originalPosition;
+    private Vector2 originalSize;
+    private Vector3 originalScale;
     private Transform originalParent;
     private Transform tempDragParent;
     private AudioSource audioSource;
@@ -116,12 +118,25 @@ public class MemoryCard : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
         }
 
         originalPosition = rectTransform.anchoredPosition;
+        originalSize = rectTransform.sizeDelta;
+        originalScale = transform.localScale;
         originalParent = transform.parent;
 
         if (tempDragParent != null)
         {
             transform.SetParent(tempDragParent);
         }
+
+        // Adjust size to match the Slot Container's slot size
+        if (manager != null && manager.slotsContainer != null && manager.slotsContainer.childCount > 0)
+        {
+            RectTransform slotRect = manager.slotsContainer.GetChild(0) as RectTransform;
+            if (slotRect != null)
+            {
+                rectTransform.sizeDelta = new Vector2(slotRect.rect.width, slotRect.rect.height);
+            }
+        }
+        transform.localScale = Vector3.one;
 
         if (canvasGroup != null)
         {
@@ -176,6 +191,14 @@ public class MemoryCard : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
         rectTransform.anchorMax = new Vector2(0.5f, 0.5f);
         rectTransform.pivot = new Vector2(0.5f, 0.5f);
         
+        // Ensure size matches the slot exactly
+        RectTransform slotRect = targetSlot as RectTransform;
+        if (slotRect != null)
+        {
+            rectTransform.sizeDelta = new Vector2(slotRect.rect.width, slotRect.rect.height);
+        }
+        transform.localScale = Vector3.one;
+        
         StartCoroutine(SmoothSnap(Vector2.zero));
     }
 
@@ -184,17 +207,24 @@ public class MemoryCard : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
         transform.SetParent(originalParent);
         
         Vector2 currentPos = rectTransform.anchoredPosition;
+        Vector2 currentSize = rectTransform.sizeDelta;
+        Vector3 currentScale = transform.localScale;
         float duration = 0.2f;
         float elapsed = 0f;
 
         while (elapsed < duration)
         {
             elapsed += Time.deltaTime;
-            rectTransform.anchoredPosition = Vector2.Lerp(currentPos, originalPosition, elapsed / duration);
+            float t = elapsed / duration;
+            rectTransform.anchoredPosition = Vector2.Lerp(currentPos, originalPosition, t);
+            rectTransform.sizeDelta = Vector2.Lerp(currentSize, originalSize, t);
+            transform.localScale = Vector3.Lerp(currentScale, originalScale, t);
             yield return null;
         }
 
         rectTransform.anchoredPosition = originalPosition;
+        rectTransform.sizeDelta = originalSize;
+        transform.localScale = originalScale;
     }
 
     private IEnumerator SmoothSnap(Vector2 targetPos)

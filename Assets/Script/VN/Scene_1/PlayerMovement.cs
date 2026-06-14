@@ -9,6 +9,7 @@ public class PlayerMovement : MonoBehaviour
     private Animator animator;
     private SpriteRenderer spriteRenderer;
     private Rigidbody2D rb;
+    private float moveInput = 0f;
 
     void Start()
     {
@@ -21,35 +22,42 @@ public class PlayerMovement : MonoBehaviour
 
     void Update()
     {
+        // 1. Logika Permainan (Input & Animasi) berjalan di Update()
         if (!canMove)
         {
+            moveInput = 0f;
             animator.SetBool("isWalking", false);
-            // Pake velocity biasa biar universal
+            return;
+        }
+
+        moveInput = 0f;
+        if (Keyboard.current.aKey.isPressed) moveInput = -1f;
+        else if (Keyboard.current.dKey.isPressed) moveInput = 1f;
+
+        // Update Animasi & Flip Sprite
+        animator.SetBool("isWalking", moveInput != 0);
+
+        if (moveInput < 0) spriteRenderer.flipX = true;
+        else if (moveInput > 0) spriteRenderer.flipX = false;
+    }
+
+    void FixedUpdate()
+    {
+        // 2. Logika Fisika (Rigidbody velocity) berjalan di FixedUpdate()
+        if (!canMove)
+        {
             if (rb != null) rb.linearVelocity = Vector2.zero;
             return;
         }
 
-        float move = 0;
-
-        if (Keyboard.current.aKey.isPressed) move = -1;
-        else if (Keyboard.current.dKey.isPressed) move = 1;
-
-        // Gerak pake velocity (Anti-Nyeret)
         if (rb != null)
         {
-            rb.linearVelocity = new Vector2(move * speed, rb.linearVelocity.y);
+            rb.linearVelocity = new Vector2(moveInput * speed, rb.linearVelocity.y);
         }
         else
         {
-            transform.Translate(Vector2.right * move * speed * Time.deltaTime);
+            transform.Translate(Vector2.right * moveInput * speed * Time.fixedDeltaTime);
         }
-
-        // Update Animasi
-        animator.SetBool("isWalking", move != 0);
-
-        // Flip Sprite
-        if (move < 0) spriteRenderer.flipX = true;
-        else if (move > 0) spriteRenderer.flipX = false;
     }
 
     public void EnableMove() { canMove = true; }

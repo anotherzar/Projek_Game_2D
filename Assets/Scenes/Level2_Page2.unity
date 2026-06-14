@@ -154,7 +154,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 30, y: -20}
-  m_SizeDelta: {x: 400, y: 90}
+  m_SizeDelta: {x: 753.2932, y: 169.491}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &28169185
 MonoBehaviour:
@@ -333,7 +333,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 30, y: -20}
-  m_SizeDelta: {x: 400, y: 90}
+  m_SizeDelta: {x: 753.2932, y: 169.491}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &73505064
 MonoBehaviour:
@@ -407,8 +407,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -357.05, y: -122}
-  m_SizeDelta: {x: 150, y: 35}
+  m_AnchoredPosition: {x: -802, y: -369}
+  m_SizeDelta: {x: 248.0081, y: 57.8692}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &379916150
 MonoBehaviour:
@@ -644,8 +644,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 20
-  m_fontSizeBase: 20
+  m_fontSize: 28.81
+  m_fontSizeBase: 28.81
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -683,7 +683,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: 0, w: 0}
+  m_margin: {x: 0, y: 0, z: -914.0344, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -822,8 +822,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 42.910004, y: 130.12}
-  m_SizeDelta: {x: 150, y: 35}
+  m_AnchoredPosition: {x: 33.99597, y: 145.46402}
+  m_SizeDelta: {x: 233.4186, y: 54.4643}
   m_Pivot: {x: 0, y: 0}
 --- !u!114 &513360757
 MonoBehaviour:
@@ -898,7 +898,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 30, y: -20}
-  m_SizeDelta: {x: 400, y: 90}
+  m_SizeDelta: {x: 753.2932, y: 169.491}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &548008149
 MonoBehaviour:
@@ -1011,8 +1011,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: -1.368103, y: 100}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchoredPosition: {x: -37, y: 102}
+  m_SizeDelta: {x: -154.7715, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &633166133
 MonoBehaviour:
@@ -1026,7 +1026,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3245ec927659c4140ac4f8d17403cc18, type: 3}
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.ContentSizeFitter
-  m_HorizontalFit: 2
+  m_HorizontalFit: 0
   m_VerticalFit: 2
 --- !u!114 &633166134
 MonoBehaviour:
@@ -2042,8 +2042,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 47.20999, y: 130.03}
-  m_SizeDelta: {x: 150, y: 35}
+  m_AnchoredPosition: {x: 40.687134, y: 145.32397}
+  m_SizeDelta: {x: 233.4186, y: 54.4643}
   m_Pivot: {x: 0, y: 0}
 --- !u!114 &1900365910
 MonoBehaviour:
@@ -2168,6 +2168,8 @@ MonoBehaviour:
     text: '"Shadow Ink..."'
   - speaker: Luma
     text: '"Dia mulai mendekat."'
+  fadeOverlay: {fileID: 0}
+  fadeDuration: 1.2
   sceneEnding: Ending_1
   audioSource: {fileID: 0}
   bgmVolume: 0.5
@@ -2224,8 +2226,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 44.7, y: 128.5}
-  m_SizeDelta: {x: 150, y: 35}
+  m_AnchoredPosition: {x: 36.781433, y: 142.94305}
+  m_SizeDelta: {x: 233.4186, y: 54.4643}
   m_Pivot: {x: 0, y: 0}
 --- !u!114 &2045069301
 MonoBehaviour:

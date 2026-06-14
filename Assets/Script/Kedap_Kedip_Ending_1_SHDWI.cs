@@ -127,7 +127,7 @@ public class Kedap_Kedip_Ending_1_SHDWI : MonoBehaviour
             toBeContinuedText.fontSize = ukuranFont;
             toBeContinuedText.fontStyle = FontStyles.Bold;
             // Pastikan text dipaksa 1 baris
-            toBeContinuedText.enableWordWrapping = false;
+            toBeContinuedText.textWrappingMode = TextWrappingModes.NoWrap;
             toBeContinuedText.overflowMode = TextOverflowModes.Overflow;
             
             Color c = warnaTeks;

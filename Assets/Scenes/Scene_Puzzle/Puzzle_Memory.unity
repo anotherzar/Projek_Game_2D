@@ -152,7 +152,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -211.9, y: -119.75}
+  m_AnchoredPosition: {x: -780, y: 413}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &8996564
@@ -175,9 +175,9 @@ MonoBehaviour:
   m_ChildAlignment: 0
   m_StartCorner: 0
   m_StartAxis: 0
-  m_CellSize: {x: 107.6, y: 171.1}
+  m_CellSize: {x: 200, y: 320}
   m_Spacing: {x: 0, y: -9.1}
-  m_Constraint: 2
+  m_Constraint: 1
   m_ConstraintCount: 1
 --- !u!1 &46531694
 GameObject:
@@ -235,6 +235,9 @@ MonoBehaviour:
   - {fileID: 11400000, guid: dfab394ab12463749b0a9d1bb3df9444, type: 2}
   - {fileID: 11400000, guid: 6b5f2c50d871c56448822935eb4cb590, type: 2}
   winPanel: {fileID: 0}
+  bgmClip: {fileID: 8300000, guid: dd495bf71e6a4c54d9d95d6f8ce92500, type: 3}
+  fadeDuration: 1
+  nextSceneName: Level2_Page2
 --- !u!1 &63663951
 GameObject:
   m_ObjectHideFlags: 0
@@ -436,8 +439,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 351, y: 195.6}
-  m_SizeDelta: {x: 100, y: 100}
+  m_AnchoredPosition: {x: 155, y: -194}
+  m_SizeDelta: {x: 299.8688, y: 299.8688}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &346590315
 MonoBehaviour:
@@ -459,9 +462,9 @@ MonoBehaviour:
   m_ChildAlignment: 0
   m_StartCorner: 0
   m_StartAxis: 0
-  m_CellSize: {x: 107.6, y: 171.1}
-  m_Spacing: {x: 0, y: -9.1}
-  m_Constraint: 1
+  m_CellSize: {x: 288, y: 437}
+  m_Spacing: {x: 15.6, y: -9.1}
+  m_Constraint: 2
   m_ConstraintCount: 1
 --- !u!1 &432337945
 GameObject:
@@ -496,8 +499,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 240.1, y: 186.4}
-  m_SizeDelta: {x: 100, y: 100}
+  m_AnchoredPosition: {x: 157.9, y: 251.8}
+  m_SizeDelta: {x: 299.8688, y: 299.8688}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &432337947
 MonoBehaviour:
@@ -519,9 +522,9 @@ MonoBehaviour:
   m_ChildAlignment: 0
   m_StartCorner: 0
   m_StartAxis: 0
-  m_CellSize: {x: 107.6, y: 153.1}
-  m_Spacing: {x: 0, y: 10.2}
-  m_Constraint: 1
+  m_CellSize: {x: 288, y: 437}
+  m_Spacing: {x: 15.6, y: 0}
+  m_Constraint: 2
   m_ConstraintCount: 1
 --- !u!1 &801923978
 GameObject:
